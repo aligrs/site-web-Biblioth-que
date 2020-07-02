@@ -1,0 +1,97 @@
+  --les requetes--
+  
+1)cette requete nous donne la liste des livres  disponible actuellement
+                     
+SELECT *
+FROM V_Livre_disponible
+
+2)cette requete nous donne la liste des livres emprunter actuellement
+
+SELECT *
+FROM V_Livre_en_pret
+
+3)cette requete nous donne la liste des livres qui ont deja été emprunter au moins une fois avec leur frequence d'emprunt
+
+SELECT *
+FROM V_frequence_livre_emprunter
+
+4)cette requete nous donne le nombre de livre disponible actuellement
+
+SELECT COUNT(V_Livre_disponible.IdLivre) AS nombre_de_livre_disponible
+FROM V_Livre_disponible
+
+5)cette requete nous donne le nombre de livre em pret actuellement
+
+SELECT COUNT(V_Livre_en_pret.IdLivre) AS nombre_de_livre_en_pret
+FROM V_Livre_en_pret
+
+6)cette requete nous donne la liste des livres emprunter par étudiant Mohamed Henni
+                     
+SELECT V_Livre_en_pret.titre,V_Livre_en_pret.cote,V_Livre_en_pret.code_barre,V_Livre_en_pret.nom_auteur,
+V_Livre_en_pret.nom_edition,V_Livre_en_pret.discipline
+FROM V_Livre_en_pret
+WHERE V_Livre_en_pret.nom_etudiant='Henni' AND V_Livre_en_pret.prenom_etudiant='Mohamed'   
+
+
+7)cette requete nous donne le nombre de livre que étudiant Mohamed  Henni  a emprunter actuellement
+
+SELECT   V_Livre_en_pret.Numero_etudiant,V_Livre_en_pret.nom_etudiant,V_Livre_en_pret.prenom_etudiant,
+COUNT(V_Livre_en_pret.IdLivre) AS nombre_de_livre_emprunter
+FROM V_Livre_en_pret
+WHERE V_Livre_en_pret.nom_etudiant='Henni' AND V_Livre_en_pret.prenom_etudiant='Mohamed'
+
+
+8)cette requete nous donne la date de retour du livres "Equations aux dérivées partielles" emprunter 
+par etudiant Mohamed Henni
+
+SELECT V_Livre_en_pret.titre,V_Livre_en_pret.cote,V_Livre_en_pret.code_barre,V_Livre_en_pret.nom_auteur,
+V_Livre_en_pret.nom_edition,Pret.date_retour
+FROM V_Livre_en_pret,Pret
+WHERE V_Livre_en_pret.IdLivre=Pret.num_livre AND V_Livre_en_pret.titre="Equations aux dérivées partielles" AND V_Livre_en_pret.nom_etudiant="Henni" AND V_Livre_en_pret.prenom_etudiant="Mohamed"
+
+
+9)cette requete nous donne le livre qui a été le plus emprunter
+
+SELECT V_frequence_livre_emprunter.titre,V_frequence_livre_emprunter.cote,V_frequence_livre_emprunter.nom_auteur,
+V_frequence_livre_emprunter.nom_edition,V_frequence_livre_emprunter.discipline,V_frequence_livre_emprunter.nombre_de_fois_emprunter
+FROM V_frequence_livre_emprunter
+WHERE V_frequence_livre_emprunter.nombre_de_fois_emprunter = (SELECT MAX(V_frequence_livre_emprunter.nombre_de_fois_emprunter) FROM V_frequence_livre_emprunter) ;
+
+10)cette requete nous donne le nombre de livre que nous avons par discipline
+
+SELECT Livre.discipline,COUNT(Livre.IdLivre) AS nombre_de_livre
+FROM Livre
+GROUP BY Livre.discipline
+
+11)cette requete nous donne le livre qui est a été le plus emprunter dans chaque discipline
+
+SELECT V_frequence_livre_emprunter.titre,V_frequence_livre_emprunter.cote,V_frequence_livre_emprunter.nom_auteur,
+V_frequence_livre_emprunter.nom_edition,V_frequence_livre_emprunter.discipline,MAX(V_frequence_livre_emprunter.nombre_de_fois_emprunter)
+FROM V_frequence_livre_emprunter
+GROUP BY V_frequence_livre_emprunter.discipline
+
+12)cette requete nous donne le nombre de livre acheté par chaque personnel de la bibliotheque
+
+SELECT Personnel.nom,Personnel.prenom,COUNT(Livre.IdLivre) AS nombres_de_livres_acheté
+FROM Personnel,Livre
+WHERE Livre.num_personnel=Personnel.IdPersonnel
+GROUP BY Personnel.IdPersonnel
+
+13)cette requete nous donne le livre le plus cher ainsi que ses exemplaires
+
+SELECT Livre.titre,Livre.cote,Livre.code_barre,Auteur.nom,Edition.nom_edition,Livre.discipline,Livre.prix
+FROM Livre,Auteur,Edition
+WHERE Livre.num_auteur=Auteur.IdAuteur AND Livre.num_edition=Edition.IdEdition AND  Livre.prix=(SELECT  MAX(Livre.prix)FROM Livre)
+
+14)cette requete nous donne le prix totale des livres par discipline.(mathematique,svt,biologie etc)
+
+SELECT Livre.discipline,SUM(Livre.prix) AS prix
+FROM Livre
+GROUP BY Livre.discipline
+
+15)cette requete nous donne les livres qui ont couté plus de 50€
+
+SELECT Livre.titre,Livre.cote,Livre.code_barre,Edition.nom_edition,Auteur.nom,Livre.discipline,Livre.prix
+FROM Livre,Auteur,Edition
+WHERE Livre.num_auteur=Auteur.IdAuteur AND Livre.num_edition=Edition.IdEdition AND Livre.prix>50
+
